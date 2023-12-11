@@ -39,15 +39,15 @@ public class TestString {
 	
 	
 	public static void strConcat(String str1) {
-		str1 = str1+"Edurekha";
+		str1 = str1+"Edureka";
 	}
 	
 	public static void strBuffConcat(StringBuffer str2) {
-		str2.append("Edurekha");
+		str2.append("Edureka");
 	}
 	
 	public static void strBuilderConcat(StringBuilder str3) {
-		str3.append("Edurekha");
+		str3.append("Edureka");
 	}
 	
 

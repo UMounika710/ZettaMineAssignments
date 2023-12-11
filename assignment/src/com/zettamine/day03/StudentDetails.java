@@ -70,29 +70,5 @@ public class StudentDetails {
 	}
 
 }
-/*
-Student ID:   101
-Student Name:  John
-Department Id:  1
-Gender[M/F]:  M
-Phone Number: 9848586878
-Hostel Name:  YMCA
-Room Number:  10
-Modify Room Number(Y/N): Y
-New Room Number: 11
-Modify Phone Number(Y/N): Y
-New Phone Number: 9876543128 
 
-OUTPUT
-The Student Details are as follows:
-
-Student ID: 101
-Student Name: John 
-Department ID: 1  
-Student Gender: Male     
-Student Phone No: 9876543121   
-Hostel Name: YMCA     
-Room No: 11
-
-*/
 

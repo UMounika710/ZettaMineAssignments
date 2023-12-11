@@ -16,7 +16,6 @@ public class ReportCard {
 		
 		String[] subArray = new String[numOfSubjects];
 
-		//subjectsEntry(subArray);
 		marksEntry(marks,subArray);
 		System.out.println();
 		printReportCard(marks,subArray,name);
