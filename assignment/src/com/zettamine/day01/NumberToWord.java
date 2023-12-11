@@ -1,4 +1,4 @@
-package com.zettamine.day1;
+package com.zettamine.day01;
 import java.util.Scanner;
 
 public class NumberToWord {

@@ -1,4 +1,4 @@
-package com.zettamine.day2;
+package com.zettamine.day02;
 
 public class SavingsAccount extends Account{
 	private int roi;
