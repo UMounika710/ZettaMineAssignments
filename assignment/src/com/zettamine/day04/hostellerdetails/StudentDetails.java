@@ -1,6 +1,7 @@
-package com.zettamine.day03;
+package com.zettamine.day04.hostellerdetails;
 
 import java.util.Scanner;
+
 
 public class StudentDetails {
 
@@ -35,14 +36,14 @@ public class StudentDetails {
 		System.out.print("Room Number: ");
 		int roomNum = sc.nextInt();
 		
-		Student student = new Hosteller(studentId,studentName,departmentId,gender,phone,hostelName,roomNum);
+		Hosteller hosteller = new Hosteller(hostelName, roomNum);
+		Student student = new Student(studentId,studentName,departmentId,gender,phone,hosteller);
 		
-		getHostellerDetails(student);
 		
 		sc.close();
 
 	}
-	public static Hosteller getHostellerDetails(Student student) {
+	public static Hosteller getHostellerDetails(Student student, Hosteller hosteller) {
 		if(student.getGender().equals("M")) {
 			student.setGender("Male");
 		}else if(student.getGender().equals("F")) {
@@ -53,7 +54,7 @@ public class StudentDetails {
 		if(modifyRoom.equalsIgnoreCase("Y")) {
 			System.out.print("New Room Number: ");
 			int newRoom = sc.nextInt();
-			((Hosteller)student).setRoomNumber(newRoom);
+			student.getHosteller().setRoomNumber(newRoom);
 		}
 		System.out.print("Modify Phone Number(Y/N): ");
 		String modifyPhone = sc.next();
@@ -61,7 +62,7 @@ public class StudentDetails {
 		if(modifyPhone.equalsIgnoreCase("Y")) {
 			System.out.print("New Phone Number: ");
 			String newPhone = sc.next();
-			((Hosteller)student).setPhone(newPhone);
+			student.setPhone(newPhone);
 		}
 		
 		System.out.printf("The Student Details are as follows:");
@@ -71,13 +72,11 @@ public class StudentDetails {
 		System.out.println("Department ID: "  + student.getDepartmentId());
 		System.out.println("Student Gender: "  + student.getGender()); 
 		System.out.println("Student Phone No: "  + student.getPhone()); 
-		System.out.println("Hostel Name: "  + ((Hosteller)student).getHostelName());    
-		System.out.println("Room No: "  + ((Hosteller)student).getRoomNumber());
-		return (Hosteller)student;
+		System.out.println("Hostel Name: "  + student.getHosteller().getHostelName());    
+		System.out.println("Room No: "  + student.getHosteller().getRoomNumber());
+		
+		return hosteller;
 	}
-
 }
-
-
 
 

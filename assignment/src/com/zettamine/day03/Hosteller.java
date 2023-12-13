@@ -14,7 +14,5 @@ public class Hosteller extends Student {
 		this.hostelName = hostelName;
 		this.roomNumber = roomNumber;
 	}
-	
-	
 
 }
