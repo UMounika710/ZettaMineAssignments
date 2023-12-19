@@ -32,8 +32,11 @@ public class SerializedProduct {
 
 		try (FileOutputStream fos = new FileOutputStream("src/stocks.ser");
 				ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+			for(Product serProduct : prodList) {
+				oos.writeObject(serProduct);
+			}
 
-			oos.writeObject(prodList);
+			
 
 			System.out.println("Product serialization completed");
 

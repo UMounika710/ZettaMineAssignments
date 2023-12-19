@@ -3,7 +3,7 @@ package com.zettamine.day05;
 import java.io.File;
 import java.io.IOException;
 
-public class FileDemo {
+public class FileRename {
 
 	public static void main(String[] args) throws IOException {
 		final String PATH = "C:/CJava";

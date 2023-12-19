@@ -13,6 +13,8 @@ public class UniqueWords {
 		String[] words = article.split("[,;:.?!\\s]+");
 		System.out.println("Number of words " + words.length);
 		
+		//check if can use StringTokenizer here
+		
 		Set<String> uniqueWords = new TreeSet<>();
 		
 		for(String word : words) {
