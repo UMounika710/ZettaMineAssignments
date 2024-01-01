@@ -17,9 +17,9 @@
     <main>
         <div class="app-grid">
             <a href="create-account.jsp?id=1" class="app-link">Create Account</a>
-            <a href="deposite.jsp" class="app-link">Deposit</a>
-            <a href="/withdraw" class="app-link">Withdraw</a>
-            <a href="/transfer" class="app-link">Transfer</a>
+            <a href="deposit.jsp?id=2" class="app-link">Deposit</a>
+            <a href="withdraw.jsp?id=3" class="app-link">Withdraw</a>
+            <a href="transfer.jsp?id=4" class="app-link">Transfer</a>
             <a href="/check-balance" class="app-link">Check Balance</a>
             <a href="/transaction-history" class="app-link">Transaction History</a>
         </div>

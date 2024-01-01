@@ -12,6 +12,13 @@ public class Account {
 	private LocalDate createdOn;
 	private Double balance;
 	private Integer custId;
+	
+	
+	public Account() {
+		super();
+	}
+	
+	
 
 }
 

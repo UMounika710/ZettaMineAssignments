@@ -2,6 +2,7 @@ package com.zm.bankapp.service;
 
 import com.zm.bankapp.dao.UserDAO;
 import com.zm.bankapp.dao.UserDAOImpl;
+import com.zm.bankapp.dto.Account;
 import com.zm.bankapp.dto.Customer;
 import com.zm.bankapp.dto.User;
 
@@ -33,6 +34,24 @@ public class UserServiceImpl implements UserService<User,Customer>{
 		return dao.getCustomerIdByName(customer.getCustName());
 	}
 
+	@Override
+	public int deposit(Account account, Integer amount) {
+		return dao.deposit(account, amount);
+	}
 
+	@Override
+	public int withdraw(Account account, Integer amount) {
+		return dao.withdraw(account, amount);
+	}
 
+	/*
+	 * @Override public int saveTransaction(Account account, Integer amount, String
+	 * txType) { return dao.saveTransaction(account, amount); }
+	 */
+
+	@Override
+	public boolean transferAmount(Account sender, Account receiver, Integer amount) {
+		return dao.transferAmount(sender, receiver, amount);
+	}
+	
 }

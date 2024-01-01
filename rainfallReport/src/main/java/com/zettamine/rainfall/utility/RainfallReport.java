@@ -61,18 +61,7 @@ public class RainfallReport {
 		return cityPincode.matches(regex);
 	}
 	
-	/*public List<AnnualRainfall> findMaximumRainfallCities () throws SQLException{
-	List<AnnualRainfall> averageRainfall = new ArrayList<AnnualRainfall>();
-	String sql = "select city_pincode,city_name, max(average_annual_rainfall) as average_rain_fall \r\n"
-			+ "from annualrainfall \r\n"
-			+ "group by city_pincode,city_name\r\n"
-			+ "having MAX(average_annual_rainfall) = (SELECT MAX(average_annual_rainfall) FROM annualrainfall)\r\n"
-			+ "ORDER BY city_name";
-	ResultSet rs = st.executeQuery(sql);
-	averageRainfall.add((AnnualRainfall) rs);
-	return averageRainfall;
-}
-*/
+	
 	
 
 }
