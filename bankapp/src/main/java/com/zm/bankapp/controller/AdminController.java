@@ -98,14 +98,19 @@ public class AdminController extends HttpServlet {
 			String amount = request.getParameter("transferAmount");
 			Account sender = new Account();
 			sender.setAccountNo(Integer.parseInt(senderAccountNo));
+			System.out.println(sender.getAccountNo()); 
 			Account receiver = new Account();
 			receiver.setAccountNo(Integer.parseInt(receiverAccountNo));
+			System.out.println(receiver.getAccountNo()); 
 			boolean transfer = service.transferAmount(sender, receiver, Integer.parseInt(amount));
 			if(transfer) {
 				response.setContentType("text/html");
 				out.print("<h2>Sender Account Number: " + senderAccountNo + "</h2>");
 				out.print("<h2>Receiver Account Number: " + receiverAccountNo + "</h2>");
 				out.print("<h2>Amount debited: " + amount + "</h2>");
+				
+				RequestDispatcher rd = request.getRequestDispatcher("transfer.jsp");
+				rd.include(request, response);
 				
 			}
 		}
