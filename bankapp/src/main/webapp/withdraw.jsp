@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,16 +14,16 @@
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: grey;
     color: white;
     text-align: center;
-    padding: 1em;
+    padding: 5px;
 }
 
 section {
     max-width: 400px;
     margin: 20px auto;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
 }
@@ -44,16 +45,18 @@ input {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: grey;
     color: white;
     padding: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
-
+h4{
+	color: green;	
+}
 button:hover {
-    background-color: #45a049;
+    background-color: #BEBEBE;
 }
 
 footer {
@@ -69,7 +72,6 @@ footer {
     <header>
         <h1>Withdraw Amount</h1>
     </header>
-
     <section>
         <form action="admin?action=withdraw" method="post">
             <label for="accountNumber">Account Number:</label>
@@ -84,6 +86,10 @@ footer {
 
     <footer>
         <button onclick="redirectForm()">Back</button>
+        <h4><c:out value="<%=request.getAttribute(\"customerName\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"account\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"amountWithdrawn\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"closingbal\")%>" /></h4>
     </footer>
 
 	<script>

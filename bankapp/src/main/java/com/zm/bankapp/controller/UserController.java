@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/user")
 public class UserController extends HttpServlet {
@@ -25,8 +26,9 @@ public class UserController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
+		HttpSession session = request.getSession();
 		if (loginUser == null)
-			loginUser = (String) request.getSession().getAttribute("login");
+			loginUser = (String) session.getAttribute("login");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		User user = new User(username, password);
@@ -47,7 +49,6 @@ public class UserController extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp?login=customer");
 				rd.forward(request, response);
 			}
-
 		}
 	}
 

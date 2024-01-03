@@ -3,9 +3,10 @@ package com.zm.bankapp.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.logging.Logger;
+import java.util.List;
 
 import com.zm.bankapp.dto.Account;
+import com.zm.bankapp.dto.BankTransaction;
 import com.zm.bankapp.dto.Customer;
 import com.zm.bankapp.dto.User;
 import com.zm.bankapp.service.UserService;
@@ -17,11 +18,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin")
 public class AdminController extends HttpServlet {
-	// private static final Logger logger =
-	// Logger.getLogger(AdminController.class.getName());
 	private static UserService<User, Customer> service = new UserServiceImpl();
 	private static String action = null;
 
@@ -47,8 +47,11 @@ public class AdminController extends HttpServlet {
 			int rowsInserted = service.createAccountAndCust(customer, user);
 			if (rowsInserted != 0) {
 				response.setContentType("text/html");
-				out.print("<h2>Account is created for Mr./Mrs. " + name + "</h2>");
-				out.print("<h2>Account Number is " + service.getAccountNoByCustId(customer) + "</h2>");
+				int accNo = service.getAccountNoByCustId(service.getCustomerIdByAadhaar(aadhaar));
+				request.setAttribute("customerName", name);
+				request.setAttribute("accountNumber", accNo);
+				RequestDispatcher rd = request.getRequestDispatcher("create-account.jsp");
+				rd.forward(request, response);
 			}
 		}
 
@@ -62,13 +65,14 @@ public class AdminController extends HttpServlet {
 				int rows = service.deposit(account, Integer.parseInt(amount));
 				String balance = account.getBalance().toString();
 				if (rows != 0) {
-					out.print("<h2>Account Number: " + accountNo + "</h2>");
-					out.print("<h2>Amount credited: " + amount + "</h2>");
-					out.print("<h2>Balance Amount: " + balance + "</h2>");
-					out.print("<button type=submit>Done</button>");
-					forward = "admin-dashboard.jsp";
-					// request.getRequestDispatcher(forward).forward(request, response);
-
+					HttpSession session = request.getSession();
+					request.setAttribute("customerName", "Customer Name: "+
+					service.getCustomerDetailsByAccountNumber(Integer.parseInt(accountNo)).getCustName());
+					request.setAttribute("creditedAccount", "Account Number: "+accountNo);
+					request.setAttribute("creditedAmount", "Credited Amount: "+amount);
+					request.setAttribute("closingbal", "Closing Balance: "+balance);
+					RequestDispatcher rd = request.getRequestDispatcher("deposit.jsp");
+					rd.forward(request, response);
 				}
 			} else {
 				out.print("<h2>Account Number with " + accountNo + " is not existed" + "</h2>");
@@ -86,14 +90,14 @@ public class AdminController extends HttpServlet {
 				int rows = service.withdraw(account, Integer.parseInt(amount));
 				String balance = account.getBalance().toString();
 				if (rows != 0) {
-					response.setContentType("text/html");
-					out.print("<h2>Account Number: " + accountNo + "</h2>");
-					out.print("<h2>Amount debited: " + amount + "</h2>");
-					out.print("<h2>Balance Amount: " + balance + "</h2>");
-					out.print("<button type=submit>Done</button>");
-					forward = "admin-dashboard.jsp";
-					// request.getRequestDispatcher(forward).forward(request, response);
-
+					HttpSession session = request.getSession();
+					request.setAttribute("customerName", "Customer Name: "+
+					service.getCustomerDetailsByAccountNumber(Integer.parseInt(accountNo)).getCustName());
+					request.setAttribute("account", "Account Number: "+accountNo);
+					request.setAttribute("amountWithdrawn", "Amount Withdrwan: "+amount);
+					request.setAttribute("closingbal", "Closing Balance: "+balance);
+					RequestDispatcher rd = request.getRequestDispatcher("withdraw.jsp");
+					rd.forward(request, response);
 				} else {
 					out.print("<h2>Insufficient funds!!!</h2>");
 				}
@@ -109,10 +113,10 @@ public class AdminController extends HttpServlet {
 			String amount = request.getParameter("transferAmount");
 			Account sender = new Account();
 			sender.setAccountNo(Integer.parseInt(senderAccountNo));
-			System.out.println(sender.getAccountNo());
+			//System.out.println(sender.getAccountNo());
 			Account receiver = new Account();
 			receiver.setAccountNo(Integer.parseInt(receiverAccountNo));
-			System.out.println(receiver.getAccountNo());
+			//System.out.println(receiver.getAccountNo());
 			if (service.validateAccountNo(sender)) {
 				if (service.validateAccountNo(receiver)) {
 					boolean transfer = service.transferAmount(sender, receiver, Integer.parseInt(amount));
@@ -134,6 +138,31 @@ public class AdminController extends HttpServlet {
 			} else {
 				out.print("<h2>Sender Account Number with " + senderAccountNo + " is not existed" + "</h2>");
 			}
+		}
+		
+		if (action.equalsIgnoreCase("checkBalance")) {
+			response.setContentType("text/html");
+			String accountNo = request.getParameter("accountNumber");
+			Account account = new Account();
+			account.setAccountNo(Integer.parseInt(accountNo));
+			if (service.validateAccountNo(account)) {
+				double balance = service.getAmount(account);
+					HttpSession session = request.getSession();
+					request.setAttribute("closingbal", "Closing Balance: "+balance);
+					RequestDispatcher rd = request.getRequestDispatcher("check-balance.jsp");
+					rd.forward(request, response);
+				}
+			} 
+		
+		if(action.equalsIgnoreCase("transactionHistory")) {
+			Integer accountNo = Integer.valueOf(request.getParameter("account-number"));
+			List<BankTransaction> transactionHistory = service.getTransactionHistoryByAccountNo(accountNo);
+	         request.setAttribute("transList",transactionHistory);
+	         response.setContentType("text/html");
+			 RequestDispatcher rd = request.getRequestDispatcher("transactionHistoryDisplay.jsp");
+			 rd.forward(request, response);
+			
+			
 		}
 	}
 }

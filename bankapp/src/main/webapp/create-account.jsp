@@ -75,7 +75,7 @@ button:hover {
 			name="password" required> <label for="address">Address:</label>
 		<input id="address" name="address" required></input>
 
-		<button type="submit">Submit</button>
+		<button type="submit">Create Account</button>
 		<button onclick="redirectForm()">Go Back</button>
 	</form>
 <script>

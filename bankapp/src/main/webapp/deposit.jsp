@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,16 +14,16 @@
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: grey;
     color: white;
     text-align: center;
-    padding: 1em;
+    padding: 5px;
 }
 
 section {
     max-width: 400px;
     margin: 20px auto;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
 }
@@ -44,16 +45,18 @@ input {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: grey;
     color: white;
     padding: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
-
+h4{
+	color: green;	
+}
 button:hover {
-    background-color: #45a049;
+    background-color: #BEBEBE;
 }
 
 footer {
@@ -78,14 +81,17 @@ footer {
             <label for="depositAmount">Deposit Amount:</label>
             <input type="number" id="depositAmount" name="depositAmount" required><br>
 
-            <button type="submit">Submit</button>
+            <button type="submit">Deposit</button>
         </form>
     </section>
 
     <footer>
         <button onclick="redirectForm()">Back</button>
+        <h4><c:out value="<%=request.getAttribute(\"customerName\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"creditedAccount\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"creditedAmount\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"closingbal\")%>" /></h4>
     </footer>
-
 	<script>
 	function redirectForm(){
 		window.location.href = "admin-dashboard.jsp";

@@ -1,14 +1,19 @@
 package com.zm.bankapp.dao;
 
-import com.zm.bankapp.dto.Account;
-import com.zm.bankapp.dto.Customer;
+import java.util.List;
 
-public interface UserDAO<User,Customer> {
-	boolean getByUserNameAndPassword(User user);
-	int saveCustomer(Customer customer);
-	int createAccount(Customer customer);
+import com.zm.bankapp.dto.Account;
+import com.zm.bankapp.dto.BankTransaction;
+import com.zm.bankapp.dto.Customer;
+import com.zm.bankapp.dto.User;
+
+public interface UserDAO<T extends User,C extends Customer> {
+	boolean getByUserNameAndPassword(T user);
+	int saveCustomer(C customer);
+	int createAccount(C customer);
 	int saveUserCredentials(User user, Integer custId);
-	int getCustomerIdByName(String name);
+	int getCustomerIdByAadhaar(String aadhaar);
+	int getAccountNoByCustomerId(Integer id);
 	int deposit(Account account, Integer amount);
 	int withdraw(Account account, Integer amount);
 	int saveTransaction(Account account, Integer amount, String txType);
@@ -16,4 +21,7 @@ public interface UserDAO<User,Customer> {
 	int saveTxFlow(Integer senderTxId, Integer receiverTxId);
 	boolean validateAccountNo(Account account);
 	double getAmount(Account account);
+	C getCustomerByAccountNumber(Integer accountNumber);
+	int checkBalance(Integer accountNo);
+	List<BankTransaction> getTransactionHistory(Integer accountNum);
 }

@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.zm.bankapp.config.ConnectionFactory;
 import com.zm.bankapp.dto.Account;
@@ -70,8 +72,7 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 	@Override
 	public int saveUserCredentials(User user, Integer custId) {
 		int rows = 0;
-		String query = "INSERT INTO bank_app.user(" + "user_id, password, user_type, cust_id)"
-				+ "	VALUES ( ?, ?, ?, ?)";
+		String query = "INSERT INTO bank_app.user(user_id, password, user_type, cust_id) VALUES ( ?, ?, ?, ?)";
 		try {
 			PreparedStatement pst = con.prepareStatement(query);
 			pst.setString(1, user.getUserId().toUpperCase());
@@ -86,15 +87,14 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 	}
 
 	@Override
-	public int getCustomerIdByName(String name) {
+	public int getCustomerIdByAadhaar(String aadhaar) {
 		int id = 0;
-		String query = "select cust_id from customer where cust_name=?";
+		String query = "select cust_id from customer where aadhaar_no=?";
 		try {
 			pst = con.prepareStatement(query);
-			pst.setString(1, name.toUpperCase());
+			pst.setString(1, aadhaar);
 			ResultSet rs = pst.executeQuery();
-			if (rs.next())
-				id = rs.getInt(1);
+			if(rs.next()) id=rs.getInt(1);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -103,7 +103,7 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 
 	public int createAccount(Customer customer) {
 		int rows = 0;
-		String query = "INSERT INTO account(" + " created_on,balance, cust_id)" + "	VALUES ( ?, ?, ?)";
+		String query = "INSERT INTO account(created_on,balance, cust_id) VALUES ( ?, ?, ?)";
 		try {
 			pst = con.prepareStatement(query);
 			pst.setDate(1, Date.valueOf(LocalDate.now()));
@@ -293,6 +293,86 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 
 		return balance;
 
+	}
+
+	@Override
+	public int getAccountNoByCustomerId(Integer id) {
+		int accountNo = 0;
+		String query = "select account_no from account where cust_id = ?";
+		try {
+			pst = con.prepareStatement(query);
+			pst.setInt(1, id);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()) accountNo=rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return accountNo;
+	}
+
+	@Override
+	public Customer getCustomerByAccountNumber(Integer accountNumber) {
+		Customer c = null;
+		String query = "select * from customer where cust_id=(select cust_id from account where account_no=?)";
+		try {
+			pst = con.prepareStatement(query);
+			pst.setInt(1, accountNumber);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				int custId = rs.getInt(1);
+				String custName = rs.getString(2);
+				String gender = rs.getString(3);
+				String mobile = rs.getString(4);
+				String email = rs.getString(5);
+				String aadhaar = rs.getString(6);
+				String address = rs.getString(7);
+				Date dob = rs.getDate(8);
+				c = new Customer(custId, custName, dob.toLocalDate(), gender, mobile, email, aadhaar, address);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return c;
+	}
+
+	@Override
+	public int checkBalance(Integer accountNo) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<BankTransaction> getTransactionHistory(Integer accountNum) {
+		List<BankTransaction> bankTransaction  = new LinkedList<>();						
+		String query ="SELECT bt.tx_id, bt.tx_date, bt.tx_type, bt.amount, bt.account_no, " +
+                 "sender.account_no AS sender_account_number, receiver.account_no AS receiver_account_number,bt.closing_bal " +
+                 "FROM bank_app.bank_tx bt " +
+                 "LEFT JOIN bank_app.tx_flow tf ON bt.tx_id = tf.sender_tx OR bt.tx_id = tf.recipient_tx " +
+                 "LEFT JOIN bank_app.bank_tx sender ON tf.sender_tx = sender.tx_id " +
+                 "LEFT JOIN bank_app.bank_tx receiver ON tf.recipient_tx = receiver.tx_id " +
+                 "WHERE bt.account_no = ?";
+		try {
+			pst = con.prepareStatement(query);
+			pst.setInt(1,accountNum);
+			ResultSet rs = pst.executeQuery();
+			while(rs.next()) {
+				Integer txId = rs.getInt(1);
+				Date txDate = rs.getDate(2);
+				LocalDate localDate = txDate.toLocalDate();
+				String txType = rs.getString(3);
+				Double amount = rs.getDouble(4);
+				Integer userAccount = rs.getInt(5);
+				Integer senderAccount = rs.getInt(6);
+				Integer receiverAccount = rs.getInt(7);
+				Double closingBalance =rs.getDouble(8);
+             BankTransaction bankTx = new BankTransaction (txId,localDate,txType,amount,userAccount,senderAccount,receiverAccount,closingBalance);
+             bankTransaction.add(bankTx);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 return  bankTransaction;
 	}
 
 }

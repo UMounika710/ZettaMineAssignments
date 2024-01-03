@@ -33,8 +33,13 @@ form {
     flex-direction: column;
 }
 
+label {
+    margin-bottom: 8px;
+}
+
 input {
     padding: 8px;
+    margin-bottom: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -65,19 +70,13 @@ footer {
 <body>
 
     <header>
-        <h1>Transfer Amount</h1>
+        <h1>Check Balance</h1>
     </header>
 
     <section>
-        <form action="admin?action=transfer" method="post">
-            <label for="senderAccountNo">Sender Account Number:</label>
-            <input type="text" id="senderAccountNo" name="senderAccountNo" required><br>
-
-            <label for="receiverAccountNo">Receiver AccountNumber:</label>
-            <input type="text" id="receiverAccountNo" name="receiverAccountNo" required><br>
-            
-            <label for="transferAmount">Transfer Amount:</label>
-            <input type="number" id="transferAmount" name="transferAmount" required><br>
+        <form action="admin?action=checkBalance" method="post">
+            <label for="accountNumber">Account Number:</label>
+            <input type="text" id="accountNumber" name="accountNumber" required><br>
 
             <button type="submit">Submit</button>
         </form>
@@ -85,15 +84,8 @@ footer {
 
     <footer>
         <button onclick="redirectForm()">Back</button>
-        <h4><c:out value="<%=request.getAttribute(\"senderDetails:\")%>" /><span>
-        <c:out value="<%=request.getAttribute(\"senderAccount:\")%>" /></span></h4>
-        <h4><c:out value="<%=request.getAttribute(\"senderClosingCal\")%>" /></h4>
-        <h4><c:out value="<%=request.getAttribute(\"creditedAmount\")%>" /></h4>
-        <h4><c:out value="<%=request.getAttribute(\"receiverName:\")%>" /><span>
-        <c:out value="<%=request.getAttribute(\"receiverAccount:\")%>" /></span></h4>
-        <h4><c:out value="<%=request.getAttribute(\"receiverClosingCal\")%>" /></h4>
+        <h4><c:out value="<%=request.getAttribute(\"closingbal\")%>" /></h4>
     </footer>
-
 	<script>
 	function redirectForm(){
 		window.location.href = "admin-dashboard.jsp";

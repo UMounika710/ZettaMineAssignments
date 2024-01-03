@@ -15,8 +15,9 @@ public class BankTransaction {
 	private String txType;
 	private Double amount;
 	private Integer accountNo;
-	private Integer adminId;
-	
-	
+	//private Integer adminId;
+	private Integer senderAccountNo;
+	private Integer receiverAccountNo;
+	private Double closingBalance;
 
 }
