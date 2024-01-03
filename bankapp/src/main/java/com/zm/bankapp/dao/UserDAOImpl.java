@@ -119,18 +119,15 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 	@Override
 	public int deposit(Account account, Integer amount) {
 		int rows = 0;
+		double closingBalance = 0;
 		String sql = "update bank_app.account set balance = balance + " + amount + " where account_no = "
 				+ account.getAccountNo();
-		String select = "select balance from bank_app.account where account_no = " + account.getAccountNo();
+
 		try {
 			pst = con.prepareStatement(sql);
 			rows = pst.executeUpdate();
 			if (rows != 0) {
-				pst = con.prepareStatement(select);
-				ResultSet rs = pst.executeQuery();
-				while (rs.next()) {
-					account.setBalance(rs.getDouble(1));
-				}
+				closingBalance = getAmount(account);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -146,15 +143,13 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 		int rows = 0;
 		String sql = "update bank_app.account set balance = balance - " + amount + " where account_no = "
 				+ account.getAccountNo();
-		String acBal = "select balance from bank_app.account where account_no = " + account.getAccountNo();
 		try {
-			pst = con.prepareStatement(sql);
-			rows = pst.executeUpdate();
-			if (rows != 0) {
-				pst = con.prepareStatement(acBal);
-				ResultSet rs = pst.executeQuery();
-				while (rs.next()) {
-					account.setBalance(rs.getDouble(1));
+			double balance = getAmount(account);
+			if (balance > amount) {
+				pst = con.prepareStatement(sql);
+				rows = pst.executeUpdate();
+				if (rows != 0) {
+					getAmount(account);
 				}
 			}
 		} catch (SQLException e) {
@@ -171,41 +166,34 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 
 	@Override
 	public boolean transferAmount(Account sender, Account receiver, Integer amount) {
-		int senderRow;
-		int receiverRow;
+		int senderRow = 0;
+		int receiverRow = 0;
 		try {
 			con.setAutoCommit(false);
 			System.out.println(sender.getAccountNo());
 			System.out.println(receiver.getAccountNo());
 			String updateSender = "update bank_app.account set balance = balance - ? where account_no =  ?";
-			pst = con.prepareStatement(updateSender);
-			pst.setInt(1, amount);
-			pst.setInt(2, sender.getAccountNo());
-			senderRow = pst.executeUpdate();
+			double balance = getAmount(sender);
+			if (balance > amount) {
+				pst = con.prepareStatement(updateSender);
+				pst.setInt(1, amount);
+				pst.setInt(2, sender.getAccountNo());
+				senderRow = pst.executeUpdate();
+			}
 			String updateReceiver = "update bank_app.account set balance = balance + ? where account_no =  ?";
 			pst = con.prepareStatement(updateReceiver);
 			pst.setInt(1, amount);
 			pst.setInt(2, receiver.getAccountNo());
 			receiverRow = pst.executeUpdate();
-
-			/*
-			 * pst.addBatch("update bank_app.account set balance = balance - " + amount +
-			 * " where account_no = " + sender.getAccountNo());
-			 * pst.addBatch("update bank_app.account set balance = balance + " + amount +
-			 * " where account_no = " + receiver.getAccountNo());
-			 */
-			// con.commit();
 			if ((senderRow > 0) && (receiverRow > 0)) {
-				
+				getAmount(sender);
+				getAmount(receiver);
+				con.commit();
+				con.setAutoCommit(true);
 				int senderTxId = saveTransaction(sender, amount, "DEBIT");
 				int receiverTxId = saveTransaction(receiver, amount, "CREDIT");
 
-				String txFlow = "INSERT INTO bank_app.tx_flow(sender_tx, recipient_tx) VALUES (?,?)";
-				pst = con.prepareStatement(txFlow);
-				pst.setInt(1, senderTxId);
-				pst.setInt(2, receiverTxId);
-				pst.executeUpdate();
-				con.commit();
+				int txFlow = saveTxFlow(senderTxId, receiverTxId);
 
 				return true;
 
@@ -225,8 +213,8 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 		BankTransaction tx = new BankTransaction();
 		int txRows = 0;
 		int txId = 0;
-		String sql = "INSERT INTO bank_app.bank_tx(tx_date, tx_type, amount, account_no, admin_id) "
-				+ "VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO bank_app.bank_tx(tx_date, tx_type, amount, account_no, closing_bal, admin_id) "
+				+ "VALUES (?, ?, ?, ?, ?, ?)";
 
 		try {
 			pst = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -234,7 +222,8 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 			pst.setString(2, txType);
 			pst.setInt(3, amount);
 			pst.setInt(4, account.getAccountNo());
-			pst.setInt(5, 1);
+			pst.setDouble(5, account.getBalance());
+			pst.setInt(6, 1);
 			txRows = pst.executeUpdate();
 			if (txRows > 0) {
 				ResultSet generatedKeys = pst.getGeneratedKeys();
@@ -250,6 +239,60 @@ public class UserDAOImpl implements UserDAO<User, Customer> {
 		}
 
 		return txId;
+	}
+
+	@Override
+	public int saveTxFlow(Integer senderTxId, Integer receiverTxId) {
+		String txFlow = "INSERT INTO bank_app.tx_flow(sender_tx, recipient_tx) VALUES (?,?)";
+		int rows = 0;
+		try {
+			pst = con.prepareStatement(txFlow);
+			pst.setInt(1, senderTxId);
+			pst.setInt(2, receiverTxId);
+			rows = pst.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rows;
+	}
+
+	@Override
+	public boolean validateAccountNo(Account account) {
+		// int rows = 0;
+		String sql = "select account_no from bank_app.account where account_no = ?";
+		try {
+			pst = con.prepareStatement(sql);
+			pst.setInt(1, account.getAccountNo());
+			ResultSet rs = pst.executeQuery();
+			if (rs.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			System.err.println("Account Number is not Existed");
+		}
+		return false;
+
+	}
+
+	@Override
+	public double getAmount(Account account) {
+		double balance = 0;
+		String select = "select balance from bank_app.account where account_no = " + account.getAccountNo();
+		try {
+			pst = con.prepareStatement(select);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				account.setBalance(rs.getDouble(1));
+			}
+			balance = account.getBalance();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return balance;
+
 	}
 
 }
